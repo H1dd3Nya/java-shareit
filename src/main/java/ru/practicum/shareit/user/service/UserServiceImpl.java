@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -19,8 +18,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final List<String> emailCache = new LinkedList<>();
-    private int cacheCounter = 0;
 
     @Override
     public User read(Long id) {
@@ -67,19 +64,6 @@ public class UserServiceImpl implements UserService {
 
     private void isEmailExist(String userEmail) {
         log.info("Checking if email already exists");
-        if (cacheCounter == 5) {
-            updateCache(userRepository.getAll().stream().map(User::getEmail).toList());
-
-            for (String cachedEmail : emailCache) {
-                if (cachedEmail != null && cachedEmail.equals(userEmail)) {
-                    throw new EmailConflictException("Email already exists");
-                }
-            }
-
-            return;
-        }
-
-        cacheCounter++;
         List<String> emails = userRepository.getAll().stream().map(User::getEmail).toList();
 
         for (String email : emails) {
@@ -87,10 +71,5 @@ public class UserServiceImpl implements UserService {
                 throw new EmailConflictException("Email already exists");
             }
         }
-    }
-
-    private void updateCache(List<String> emails) {
-        emailCache.clear();
-        emailCache.addAll(emails);
     }
 }
