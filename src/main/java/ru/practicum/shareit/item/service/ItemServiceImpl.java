@@ -14,7 +14,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -34,15 +33,15 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAll(Long ownerId) {
         log.info("Getting all items for user with id {}", ownerId);
+        User owner = getUser(ownerId);
 
-        userExistCheck(userRepository.getById(ownerId));
-        return itemMapper.toDtoList(itemRepository.getAllByOwner(ownerId));
+        return itemMapper.toDtoList(itemRepository.getAllByOwner(owner.getId()));
     }
 
     @Override
     public ItemDto create(ItemDto item, Long ownerId) {
         log.info("Checking if user with id={} is exist", ownerId);
-        User owner = userExistCheck(userRepository.getById(ownerId));
+        User owner = getUser(ownerId);
 
         if (item.getAvailable() == null) {
             throw new NullFieldException("Available field is null");
@@ -67,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(ItemDto item, Long itemId, Long ownerId) {
         log.info("Checking if user with id={} and item with id={} is exist", ownerId, itemId);
-        User itemOwner = userExistCheck(userRepository.getById(ownerId));
+        User itemOwner = getUser(ownerId);
         Item updateItem = itemRepository.read(itemId).orElseThrow(() -> new NotFoundException("Item not found"));
 
         log.info("Checking user permission");
@@ -89,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toDtoList(itemRepository.findByName(text));
     }
 
-    private User userExistCheck(Optional<User> user) {
-        return user.orElseThrow(() -> new NotFoundException("User not found"));
+    private User getUser(Long userId) {
+        return userRepository.getById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

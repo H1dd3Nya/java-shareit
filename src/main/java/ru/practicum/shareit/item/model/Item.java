@@ -18,5 +18,5 @@ public class Item {
     @Size(max = 255)
     private String description;
     private Boolean isAvailable;
-    private ItemRequest requestId;
+    private ItemRequest requestForItem;
 }
