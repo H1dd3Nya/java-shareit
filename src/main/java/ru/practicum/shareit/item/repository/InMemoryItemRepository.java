@@ -36,7 +36,7 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public List<Item> getAllByOwner(Long ownerId) {
         return items.values().stream()
-                .filter(item -> item.getOwner().equals(ownerId))
+                .filter(item -> item.getOwner().getId().equals(ownerId))
                 .toList();
     }
 
@@ -48,5 +48,18 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public void delete(Item item) {
         items.remove(item.getId());
+    }
+
+    @Override
+    public List<Item> findByName(String text) {
+        List<Item> matchedItems = new ArrayList<>();
+
+        for (Item item : items.values()) {
+            if (item.getName() != null && item.getName().equalsIgnoreCase(text) && item.getIsAvailable()) {
+                matchedItems.add(item);
+            }
+        }
+
+        return matchedItems;
     }
 }

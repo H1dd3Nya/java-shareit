@@ -23,9 +23,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto read(@PathVariable Long itemId) {
+    public ItemDto getById(@PathVariable Long itemId) {
         log.info("GET read item: {}", itemId);
-        return itemService.read(itemId);
+        return itemService.getById(itemId);
     }
 
     @GetMapping

@@ -20,8 +20,8 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public User read(Long id) {
-        return userRepository.read(id).orElseThrow(() -> new NotFoundException("User not found"));
+    public User getById(Long id) {
+        return userRepository.getById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
@@ -44,10 +44,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto user, Long userId) {
-        isEmailExist(user.getEmail());
-
         log.info("Getting user with id={}", userId);
-        User oldUser = userRepository.read(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        User oldUser = userRepository.getById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        isEmailExist(user.getEmail());
 
         log.info("Updating data for user={}", oldUser);
         oldUser.setName(user.getName());
@@ -64,12 +63,8 @@ public class UserServiceImpl implements UserService {
 
     private void isEmailExist(String userEmail) {
         log.info("Checking if email already exists");
-        List<String> emails = userRepository.getAll().stream().map(User::getEmail).toList();
-
-        for (String email : emails) {
-            if (email != null && email.equals(userEmail)) {
-                throw new EmailConflictException("Email already exists");
-            }
+        if (userRepository.isEmailExist(userEmail)) {
+            throw new EmailConflictException("Email already exists");
         }
     }
 }

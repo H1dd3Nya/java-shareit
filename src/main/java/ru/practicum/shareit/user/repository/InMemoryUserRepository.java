@@ -13,7 +13,7 @@ public class InMemoryUserRepository implements UserRepository {
     private Long counter = 1L;
 
     @Override
-    public Optional<User> read(Long id) {
+    public Optional<User> getById(Long id) {
         return Optional.ofNullable(users.get(id));
     }
 
@@ -41,5 +41,13 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public void delete(Long id) {
         users.remove(id);
+    }
+
+    @Override
+    public boolean isEmailExist(String email) {
+        return users.values()
+                .stream()
+                .filter(user -> user.getEmail() != null && user.getEmail().equals(email))
+                .findFirst().orElse(null) != null;
     }
 }

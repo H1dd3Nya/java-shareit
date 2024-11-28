@@ -22,9 +22,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User read(@PathVariable Long id) {
+    public User getById(@PathVariable Long id) {
         log.info("GET read with id={}", id);
-        return userService.read(id);
+        return userService.getById(id);
     }
 
     @PatchMapping("/{userId}")

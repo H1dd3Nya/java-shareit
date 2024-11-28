@@ -17,4 +17,6 @@ public interface ItemRepository {
     Item update(Item item);
 
     void delete(Item item);
+
+    List<Item> findByName(String text);
 }

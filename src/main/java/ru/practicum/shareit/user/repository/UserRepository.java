@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
-    Optional<User> read(Long id);
+    Optional<User> getById(Long id);
 
     List<User> getAll();
 
@@ -15,4 +15,6 @@ public interface UserRepository {
     User update(User user);
 
     void delete(Long id);
+
+    boolean isEmailExist(String email);
 }

@@ -13,8 +13,8 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -26,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public ItemDto read(Long id) {
+    public ItemDto getById(Long id) {
         log.info("Read Item: {}", id);
         return itemMapper.toItemDto(itemRepository.read(id).orElseThrow(() -> new NotFoundException("Item not found")));
     }
@@ -34,13 +34,15 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAll(Long ownerId) {
         log.info("Getting all items for user with id {}", ownerId);
+
+        userExistCheck(userRepository.getById(ownerId));
         return itemMapper.toDtoList(itemRepository.getAllByOwner(ownerId));
     }
 
     @Override
     public ItemDto create(ItemDto item, Long ownerId) {
         log.info("Checking if user with id={} is exist", ownerId);
-        userRepository.read(ownerId).orElseThrow(() -> new NotFoundException("User not found"));
+        User owner = userExistCheck(userRepository.getById(ownerId));
 
         if (item.getAvailable() == null) {
             throw new NullFieldException("Available field is null");
@@ -53,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
         log.info("Preparing new data");
         Item newItem = new Item();
 
-        newItem.setOwner(ownerId);
+        newItem.setOwner(owner);
         newItem.setName(item.getName());
         newItem.setDescription(item.getDescription());
         newItem.setIsAvailable(item.getAvailable());
@@ -65,11 +67,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(ItemDto item, Long itemId, Long ownerId) {
         log.info("Checking if user with id={} and item with id={} is exist", ownerId, itemId);
-        User itemOwner = userRepository.read(ownerId).orElseThrow(() -> new NotFoundException("User not found"));
+        User itemOwner = userExistCheck(userRepository.getById(ownerId));
         Item updateItem = itemRepository.read(itemId).orElseThrow(() -> new NotFoundException("Item not found"));
 
         log.info("Checking user permission");
-        if (!updateItem.getOwner().equals(itemOwner.getId())) {
+        if (!updateItem.getOwner().getId().equals(itemOwner.getId())) {
             throw new AccessDeniedException("You do not have permission to update this item");
         }
 
@@ -84,15 +86,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> find(String text) {
-        List<Item> items = itemRepository.getAll();
-        List<Item> matchedItems = new ArrayList<>();
+        return itemMapper.toDtoList(itemRepository.findByName(text));
+    }
 
-        for (Item item : items) {
-            if (item.getName() != null && item.getName().equalsIgnoreCase(text) && item.getIsAvailable()) {
-                matchedItems.add(item);
-            }
-        }
-
-        return itemMapper.toDtoList(matchedItems);
+    private User userExistCheck(Optional<User> user) {
+        return user.orElseThrow(() -> new NotFoundException("User not found"));
     }
 }
