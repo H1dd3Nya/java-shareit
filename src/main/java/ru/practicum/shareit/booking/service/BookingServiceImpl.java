@@ -95,16 +95,20 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 return bookingRepository
-                        .findAllByStartLessThanAndEndGreaterThanAndBookerEqualsAndStatusOrderByStartDesc
-                                (now, now, user, Status.APPROVED);
+                        .findAllByStartLessThanAndEndGreaterThanAndBookerEqualsAndStatusOrderByStartDesc(now,
+                                now,
+                                user,
+                                Status.APPROVED);
             case PAST:
                 return bookingRepository
-                        .findAllByEndBeforeAndBookerEqualsAndStatusOrderByStartDesc
-                                (now, user, Status.APPROVED);
+                        .findAllByEndBeforeAndBookerEqualsAndStatusOrderByStartDesc(now,
+                                user,
+                                Status.APPROVED);
             case FUTURE:
                 return bookingRepository
-                        .findAllByStartGreaterThanAndBookerEqualsAndStatusOrderByStartDesc
-                                (now, user, Status.APPROVED);
+                        .findAllByStartGreaterThanAndBookerEqualsAndStatusOrderByStartDesc(now,
+                                user,
+                                Status.APPROVED);
             case WAITING:
                 return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(user, Status.WAITING);
             case REJECTED:

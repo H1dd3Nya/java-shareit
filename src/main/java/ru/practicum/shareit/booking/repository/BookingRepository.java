@@ -16,14 +16,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerAndStatusOrderByStartDesc(User user, Status status);
 
-    List<Booking> findAllByEndBeforeAndBookerEqualsAndStatusOrderByStartDesc
-            (LocalDateTime now, User user, Status status);
+    List<Booking> findAllByEndBeforeAndBookerEqualsAndStatusOrderByStartDesc(LocalDateTime now,
+                                                                             User user,
+                                                                             Status status);
 
-    List<Booking> findAllByStartGreaterThanAndBookerEqualsAndStatusOrderByStartDesc
-            (LocalDateTime start, User user, Status status);
+    List<Booking> findAllByStartGreaterThanAndBookerEqualsAndStatusOrderByStartDesc(LocalDateTime start,
+                                                                                    User user,
+                                                                                    Status status);
 
-    List<Booking> findAllByStartLessThanAndEndGreaterThanAndBookerEqualsAndStatusOrderByStartDesc
-            (LocalDateTime start, LocalDateTime end, User user, Status status);
+    List<Booking> findAllByStartLessThanAndEndGreaterThanAndBookerEqualsAndStatusOrderByStartDesc(LocalDateTime start,
+                                                                                                  LocalDateTime end,
+                                                                                                  User user,
+                                                                                                  Status status);
 
     @Query("select b from Booking as b" +
             " join Item as i on b.item.id = i.id" +
