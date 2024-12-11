@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,18 +16,19 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
     public User getById(Long id) {
-        return userRepository.getById(id).orElseThrow(() -> new NotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
     public List<UserDto> getAll() {
-        return userMapper.toUserDtoList(userRepository.getAll());
+        return userMapper.toUserDtoList(userRepository.findAll());
     }
 
     @Override
@@ -39,31 +41,35 @@ public class UserServiceImpl implements UserService {
         newUser.setEmail(user.getEmail());
 
         log.info("Saving new user={}", newUser);
-        return userMapper.toUserDto(userRepository.create(newUser));
+        return userMapper.toUserDto(userRepository.save(newUser));
     }
 
     @Override
     public UserDto update(UserDto user, Long userId) {
         log.info("Getting user with id={}", userId);
-        User oldUser = userRepository.getById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        User oldUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         isEmailExist(user.getEmail());
 
         log.info("Updating data for user={}", oldUser);
-        oldUser.setName(user.getName());
-        oldUser.setEmail(user.getEmail());
+        if (user.getName() != null) {
+            oldUser.setName(user.getName());
+        }
+        if (user.getEmail() != null) {
+            oldUser.setEmail(user.getEmail());
+        }
 
         log.info("Calling repository method and returning DTO");
-        return userMapper.toUserDto(userRepository.update(oldUser));
+        return userMapper.toUserDto(userRepository.save(oldUser));
     }
 
     @Override
     public void delete(Long id) {
-        userRepository.delete(id);
+        userRepository.delete(userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found")));
     }
 
     private void isEmailExist(String userEmail) {
         log.info("Checking if email already exists");
-        if (userRepository.isEmailExist(userEmail)) {
+        if (!userRepository.findByEmailContainingIgnoreCase(userEmail).isEmpty()) {
             throw new EmailConflictException("Email already exists");
         }
     }
