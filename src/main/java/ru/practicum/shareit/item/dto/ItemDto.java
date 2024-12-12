@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import ru.practicum.shareit.booking.model.Booking;
+
+import java.util.List;
 
 @Data
 public class ItemDto {
@@ -11,4 +14,7 @@ public class ItemDto {
     @Size(min = 1, max = 255)
     private String description;
     private Boolean available;
+    private Booking lastBooking;
+    private Booking nextBooking;
+    private List<CommentDto> comments;
 }

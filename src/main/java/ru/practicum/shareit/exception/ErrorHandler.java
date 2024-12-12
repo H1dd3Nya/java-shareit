@@ -33,7 +33,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessDeniedException(final AccessDeniedException e) {
         log.warn(e.getMessage());
         return new ErrorResponse(e.getMessage());
