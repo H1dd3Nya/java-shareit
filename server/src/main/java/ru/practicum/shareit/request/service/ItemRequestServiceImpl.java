@@ -76,8 +76,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<ItemRequestDto> requests = itemRequestMapper.toDtoList(itemRequestRepository
                 .findFirst20ByOrderByCreatedAtDesc());
 
-        Map<Long, ItemRequestDto> requestMap = new HashMap<>();
-
         return mapResponseToRequests(requests);
     }
 
