@@ -24,14 +24,14 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getById(@PathVariable Long id) {
-        log.info("GET read with id={}", id);
+        log.info("GET user with id={}", id);
         return userClient.getUser(id);
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<Object> update(@RequestBody @Valid UserDto user,
                                          @PathVariable Long userId) {
-        log.info("PATCH update with userId={} and body={}", userId, user);
+        log.info("PATCH update user with userId={} and body={}", userId, user);
         return userClient.updateUser(userId, user);
     }
 
