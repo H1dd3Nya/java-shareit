@@ -23,7 +23,7 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public List<ItemRequestDto> getRequest(@RequestHeader(SHARER_USER_ID) Long userId) {
+    public List<ItemRequestDto> getRequestByUser(@RequestHeader(SHARER_USER_ID) Long userId) {
         return itemRequestService.getByUserId(userId);
     }
 

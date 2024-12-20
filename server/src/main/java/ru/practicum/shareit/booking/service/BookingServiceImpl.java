@@ -136,11 +136,6 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Override
-    public List<Booking> getAllBookingsForUser(Long userId) {
-        return bookingRepository.findAllByBookerOrderByStartDesc(getUser(userId));
-    }
-
     private User getUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }

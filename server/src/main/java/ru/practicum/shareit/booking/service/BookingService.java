@@ -16,6 +16,4 @@ public interface BookingService {
     List<Booking> getAllForCurrentUser(Long userId, State state);
 
     List<Booking> getAllForOwner(Long userId, State state);
-
-    List<Booking> getAllBookingsForUser(Long userId);
 }

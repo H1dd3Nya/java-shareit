@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.NullFieldException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.mappers.CommentMapper;
@@ -55,11 +54,16 @@ public class ItemServiceImpl implements ItemService {
 
             BookingDto next = bookingMapper.toBookingDto(bookingRepository
                     .findFirstByStartGreaterThanAndItemIdEquals(LocalDateTime.now(), item.getId()));
-
-            return itemMapper.toItemDto(item, last, next, comments);
+            ItemDto dto = itemMapper.toItemDto(item);
+            dto.setComments(comments);
+            dto.setNextBooking(next);
+            dto.setLastBooking(last);
+            return dto;
         }
 
-        return itemMapper.toItemDto(item, comments);
+        ItemDto dto = itemMapper.toItemDto(item);
+        dto.setComments(comments);
+        return dto;
     }
 
     @Override
@@ -77,13 +81,20 @@ public class ItemServiceImpl implements ItemService {
                 BookingDto next = bookings.get(item.getId()).get("next");
                 List<CommentDto> commentList = comments.get(item.getId());
 
-                itemDtos.add(itemMapper.toItemDto(item, last, next, commentList));
+                ItemDto dto = itemMapper.toItemDto(item);
+                dto.setNextBooking(next);
+                dto.setLastBooking(last);
+                dto.setComments(commentList);
+
+                itemDtos.add(dto);
                 continue;
             }
 
             List<CommentDto> commentList = comments.get(item.getId());
 
-            itemDtos.add(itemMapper.toItemDto(item, commentList));
+            ItemDto dto = itemMapper.toItemDto(item);
+            dto.setComments(commentList);
+            itemDtos.add(dto);
         }
 
         return itemDtos;
@@ -144,14 +155,6 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(ItemDto item, Long ownerId) {
         log.info("Checking if user with id={} is exist", ownerId);
         User owner = getUser(ownerId);
-
-        if (item.getAvailable() == null) {
-            throw new NullFieldException("Available field is null");
-        }
-
-        if (item.getDescription() == null) {
-            throw new NullFieldException("Description field is null");
-        }
 
         log.info("Preparing new data");
         Item newItem = new Item();

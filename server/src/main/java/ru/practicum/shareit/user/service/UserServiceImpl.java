@@ -11,8 +11,6 @@ import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -24,11 +22,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getById(Long id) {
         return userMapper.toUserDto(userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found")));
-    }
-
-    @Override
-    public List<UserDto> getAll() {
-        return userMapper.toUserDtoList(userRepository.findAll());
     }
 
     @Override
