@@ -73,12 +73,14 @@ class ItemServiceImplTest extends TestValuesGenerator {
         setTestUser(2);
         setTestItem(1, 1, true, null);
         setTestItem(2, 1, true, null);
+        setTestComment(1, 2, 1);
         List<Item> testItems = getAllTestItems();
 
         List<ItemDto> items = service.getAll(1L);
 
         assertEqualsItems(testItems.get(0), items.get(0));
         assertEqualsItems(testItems.get(1), items.get(1));
+        assertEquals(1, items.get(0).getComments().size());
     }
 
     @Test
