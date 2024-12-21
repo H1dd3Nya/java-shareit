@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.mappers.ItemShortMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.mappers.ItemRequestMapper;
-import ru.practicum.shareit.request.dto.mappers.ItemResponseMapper;
-import ru.practicum.shareit.request.dto.mappers.ItemToItemResponseMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.model.ItemResponse;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -30,9 +29,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final ItemToItemResponseMapper itemToItemResponseMapper;
     private final ItemRequestMapper itemRequestMapper;
-    private final ItemResponseMapper itemResponseMapper;
+    private final ItemShortMapper itemShortMapper;
 
     @Override
     public ItemRequestDto createItemRequest(ItemRequestDto requestDto, Long userId) {
@@ -50,10 +48,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto getItemRequestById(Long id) {
         ItemRequestDto requestDto = itemRequestMapper.toDto(getItemRequest(id));
 
-        List<ItemResponse> requestResponses = itemToItemResponseMapper
-                .toItemResponses(itemRepository.findFirst20ByRequestIdOrderByIdDesc(requestDto.getId()));
+//        List<ItemResponse> requestResponses = itemToItemResponseMapper
+//                .toItemResponses(itemRepository.findFirst20ByRequestIdOrderByIdDesc(requestDto.getId()));
 
-        requestDto.setItems(itemResponseMapper.toDtoList(requestResponses));
+        requestDto.setItems(itemShortMapper.toDtoList(itemRepository.findFirst20ByRequestIdOrderByIdDesc(requestDto.getId())));
 
         return requestDto;
     }
@@ -86,16 +84,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             requestMap.put(request.getId(), request);
         }
 
-        List<ItemResponse> responses = itemToItemResponseMapper.toItemResponses(itemRepository
-                .getItemsByRequestIds(new ArrayList<>(requestMap.keySet())));
+        List<Item> items = itemRepository
+                .getItemsByRequestIds(new ArrayList<>(requestMap.keySet()));
 
-        for (ItemResponse response : responses) {
-            ItemRequestDto request = requestMap.get(response.getRequestId());
+        for (Item item : items) {
+            ItemRequestDto request = requestMap.get(item.getRequestId());
             if (request.getItems() == null) {
                 request.setItems(new ArrayList<>());
             }
 
-            requestMap.get(response.getRequestId()).getItems().add(itemResponseMapper.toDto(response));
+            requestMap.get(item.getRequestId()).getItems().add(itemShortMapper.toDto(item));
         }
 
         return new ArrayList<>(requestMap.values());
