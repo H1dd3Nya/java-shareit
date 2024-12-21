@@ -47,10 +47,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto getItemRequestById(Long id) {
         ItemRequestDto requestDto = itemRequestMapper.toDto(getItemRequest(id));
-
-//        List<ItemResponse> requestResponses = itemToItemResponseMapper
-//                .toItemResponses(itemRepository.findFirst20ByRequestIdOrderByIdDesc(requestDto.getId()));
-
         requestDto.setItems(itemShortMapper.toDtoList(itemRepository.findFirst20ByRequestIdOrderByIdDesc(requestDto.getId())));
 
         return requestDto;
